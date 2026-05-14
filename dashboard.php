@@ -12,7 +12,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Monitoring Suhu MODBUS</title>
+    <title>Monitoring Suhu Ruangan dan Mesin/Perangkat pada Pabrik atau Industri</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -75,12 +75,13 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
         }
 
         .navbar-brand {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
             background: linear-gradient(135deg, #3498db, #9b59b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1.3;
         }
 
         .navbar-brand i {
@@ -408,6 +409,96 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             font-size: 24px;
         }
 
+        /* Threshold settings */
+        .threshold-section {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .threshold-item {
+            background: rgba(20, 29, 47, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .threshold-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .threshold-label {
+            color: #b0bec5;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .threshold-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .threshold-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 70px;
+            text-align: center;
+        }
+
+        .threshold-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .mode-btn {
+            background: rgba(155, 89, 182, 0.1);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            color: #9b59b6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .mode-btn:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+        }
+
+        .mode-btn.active {
+            background: rgba(155, 89, 182, 0.3);
+            border-color: #9b59b6;
+        }
+
+        .mode-indicator {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
         /* Chart container */
         .chart-container {
             position: relative;
@@ -473,6 +564,12 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             border: 1px solid rgba(241, 196, 15, 0.3);
         }
 
+        .badge-info {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
         /* Logout button */
         .btn-logout {
             width: 100%;
@@ -522,6 +619,16 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             to { transform: rotate(360deg); }
         }
 
+        /* Content sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .top-info-bar {
@@ -542,29 +649,20 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                 grid-template-columns: 1fr;
             }
 
+            .threshold-controls {
+                flex-wrap: wrap;
+            }
+
+            .mode-toggle {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+
             .sidebar {
                 margin-bottom: 20px;
                 position: static;
             }
-        }
-
-        /* Menu active indicator */
-        .menu-indicator {
-            width: 3px;
-            height: 20px;
-            background: linear-gradient(180deg, #3498db, #9b59b6);
-            border-radius: 2px;
-            margin-right: 10px;
-        }
-
-        /* Content sections */
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in;
         }
     </style>
 </head>
@@ -573,7 +671,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <span class="navbar-brand">
-                <i class="fas fa-thermometer-half"></i> Smart Thermo
+                <i class="fas fa-thermometer-half"></i> Monitoring Suhu Ruangan dan Mesin/Perangkat pada Pabrik atau Industri
             </span>
             <div class="navbar-text">
                 <span class="status-indicator" id="statusIndicator"></span>
@@ -690,31 +788,122 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title">
-                                <i class="fas fa-sliders-h"></i> Kontrol Perangkat
+                                <i class="fas fa-sliders-h"></i> Kontrol Perangkat dengan Threshold
                             </h5>
                         </div>
                         <div class="card-body">
-                            <h6 class="mb-4">Kipas (Fan)</h6>
+                            <!-- Kipas 1 Control -->
+                            <h6 class="mb-3" style="color: #3498db;">
+                                <i class="fas fa-fan"></i> Kipas 1 (Sensor: DHT22 - Suhu Ruangan)
+                            </h6>
+                            
                             <div class="control-grid">
-                                <button class="control-btn" id="fan1Btn" onclick="toggleFan(1)">
+                                <button class="control-btn" id="fan1Btn" onclick="toggleFan(1, 'manual')">
                                     <i class="fas fa-fan"></i>
                                     <span>Kipas 1: <span id="fan1Status">OFF</span></span>
                                 </button>
-                                <button class="control-btn" id="fan2Btn" onclick="toggleFan(2)">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="flex: 1; margin-right: 15px;">
+                                        <span style="font-size: 12px; color: #b0bec5;">Mode: <span id="fan1Mode" style="color: #3498db; font-weight: 600;">Manual</span></span>
+                                    </div>
+                                    <div class="mode-toggle">
+                                        <button class="mode-btn active" onclick="setFan1Mode('manual')">Manual</button>
+                                        <button class="mode-btn" onclick="setFan1Mode('auto')">Auto</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="threshold-section">
+                                <div class="threshold-label">
+                                    <i class="fas fa-thermometer-half"></i> Pengaturan Threshold Kipas 1
+                                </div>
+                                <div class="threshold-item">
+                                    <div class="threshold-label">Aktif Saat Suhu Ruangan ≥</div>
+                                    <div class="threshold-controls">
+                                        <input type="number" class="threshold-input" id="fan1Threshold" value="32" min="20" max="50" onchange="updateFan1Threshold()">
+                                        <span style="color: #b0bec5;">°C</span>
+                                        <div class="mode-indicator">
+                                            Threshold saat ini: <strong id="fan1ThresholdDisplay">32</strong>°C
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 25px 0;">
+
+                            <!-- Kipas 2 Control -->
+                            <h6 class="mb-3" style="color: #e74c3c;">
+                                <i class="fas fa-fan"></i> Kipas 2 (Sensor: PT100 - Suhu Mesin/Perangkat)
+                            </h6>
+
+                            <div class="control-grid">
+                                <button class="control-btn" id="fan2Btn" onclick="toggleFan(2, 'manual')">
                                     <i class="fas fa-fan"></i>
                                     <span>Kipas 2: <span id="fan2Status">OFF</span></span>
                                 </button>
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="flex: 1; margin-right: 15px;">
+                                        <span style="font-size: 12px; color: #b0bec5;">Mode: <span id="fan2Mode" style="color: #3498db; font-weight: 600;">Manual</span></span>
+                                    </div>
+                                    <div class="mode-toggle">
+                                        <button class="mode-btn active" onclick="setFan2Mode('manual')">Manual</button>
+                                        <button class="mode-btn" onclick="setFan2Mode('auto')">Auto</button>
+                                    </div>
+                                </div>
                             </div>
 
-                            <h6 class="mb-4 mt-4">Buzzer (Alarm)</h6>
+                            <div class="threshold-section">
+                                <div class="threshold-label">
+                                    <i class="fas fa-thermometer-half"></i> Pengaturan Threshold Kipas 2
+                                </div>
+                                <div class="threshold-item">
+                                    <div class="threshold-label">Aktif Saat Suhu Mesin ≥</div>
+                                    <div class="threshold-controls">
+                                        <input type="number" class="threshold-input" id="fan2Threshold" value="48" min="35" max="60" onchange="updateFan2Threshold()">
+                                        <span style="color: #b0bec5;">°C</span>
+                                        <div class="mode-indicator">
+                                            Threshold saat ini: <strong id="fan2ThresholdDisplay">48</strong>°C
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 25px 0;">
+
+                            <!-- Buzzer Control -->
+                            <h6 class="mb-3" style="color: #f1c40f;">
+                                <i class="fas fa-volume-up"></i> Buzzer (Alarm)
+                            </h6>
+
                             <div class="control-grid">
-                                <button class="control-btn" id="buzzerBtn" onclick="toggleBuzzer()">
+                                <button class="control-btn" id="buzzerBtn" onclick="toggleBuzzer('manual')">
                                     <i class="fas fa-volume-up"></i>
                                     <span>Buzzer: <span id="buzzerStatus">OFF</span></span>
                                 </button>
-                                <div style="padding: 20px; background: rgba(241, 196, 15, 0.1); border-radius: 12px; border: 1px solid rgba(241, 196, 15, 0.3); display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas fa-info-circle" style="color: #f1c40f;"></i>
-                                    <span style="font-size: 14px; color: #b0bec5;">Aktif saat suhu mesin > 50°C</span>
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="flex: 1; margin-right: 15px;">
+                                        <span style="font-size: 12px; color: #b0bec5;">Mode: <span id="buzzerMode" style="color: #3498db; font-weight: 600;">Manual</span></span>
+                                    </div>
+                                    <div class="mode-toggle">
+                                        <button class="mode-btn active" onclick="setBuzzerMode('manual')">Manual</button>
+                                        <button class="mode-btn" onclick="setBuzzerMode('auto')">Auto</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="threshold-section">
+                                <div class="threshold-label">
+                                    <i class="fas fa-thermometer-half"></i> Pengaturan Threshold Buzzer
+                                </div>
+                                <div class="threshold-item">
+                                    <div class="threshold-label">Aktif Saat Suhu Mesin ≥</div>
+                                    <div class="threshold-controls">
+                                        <input type="number" class="threshold-input" id="buzzerThreshold" value="52" min="35" max="60" onchange="updateBuzzerThreshold()">
+                                        <span style="color: #b0bec5;">°C</span>
+                                        <div class="mode-indicator">
+                                            Threshold saat ini: <strong id="buzzerThresholdDisplay">52</strong>°C
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -754,8 +943,8 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                                             <th>Suhu Ruangan</th>
                                             <th>Kelembaban</th>
                                             <th>Suhu Mesin</th>
-                                            <th>Status Kipas 1</th>
-                                            <th>Status Kipas 2</th>
+                                            <th>Kipas 1</th>
+                                            <th>Kipas 2</th>
                                             <th>Buzzer</th>
                                         </tr>
                                     </thead>
@@ -821,7 +1010,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                                         <p style="margin: 0; font-size: 14px;">
                                             <strong>Transmitter:</strong> ATMega328 - Baurate: 9600<br>
                                             <strong>Receiver:</strong> ESP32 - SSID: SmartThermo_WiFi<br>
-                                            <strong>Protokol:</strong> Modbus RTU - 9600 bps
+                                            <strong>Protokol:</strong> Modbus RTU - 9600 bps<br>
+                                            <strong>Sensor 1 (DHT22):</strong> Monitoring Suhu & Kelembaban Ruangan<br>
+                                            <strong>Sensor 2 (PT100):</strong> Monitoring Suhu Mesin/Perangkat
                                         </p>
                                     </div>
                                 </div>
@@ -883,9 +1074,10 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             mesin: [42, 43, 44, 45.3, 44.8, 44.1, 44.5, 45, 45.8, 46, 45.5, 45.3]
         };
 
-        let fan1Status = false;
-        let fan2Status = false;
-        let buzzerStatus = false;
+        // Control states
+        let fan1 = { status: false, mode: 'manual', threshold: 32 };
+        let fan2 = { status: false, mode: 'manual', threshold: 48 };
+        let buzzer = { status: false, mode: 'manual', threshold: 52 };
 
         // Initialize Chart
         function initChart() {
@@ -896,7 +1088,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                     labels: ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '24:00'],
                     datasets: [
                         {
-                            label: 'Suhu Ruangan',
+                            label: 'Suhu Ruangan (DHT22)',
                             data: tempData.ruangan,
                             borderColor: '#3498db',
                             backgroundColor: 'rgba(52, 152, 219, 0.1)',
@@ -910,7 +1102,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                             pointHoverRadius: 7
                         },
                         {
-                            label: 'Suhu Mesin',
+                            label: 'Suhu Mesin (PT100)',
                             data: tempData.mesin,
                             borderColor: '#e74c3c',
                             backgroundColor: 'rgba(231, 76, 60, 0.1)',
@@ -941,7 +1133,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                         y: {
                             beginAtZero: false,
                             min: 20,
-                            max: 50,
+                            max: 60,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#b0bec5' }
                         },
@@ -971,39 +1163,105 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             }
         }
 
-        // Toggle Fan
-        function toggleFan(fanNumber) {
+        // Fan 1 Controls (DHT22)
+        function toggleFan(fanNumber, mode) {
             if (fanNumber === 1) {
-                fan1Status = !fan1Status;
-                const btn = document.getElementById('fan1Btn');
-                const status = document.getElementById('fan1Status');
-                if (fan1Status) {
-                    btn.classList.add('active');
-                    status.textContent = 'ON';
-                } else {
-                    btn.classList.remove('active');
-                    status.textContent = 'OFF';
+                if (fan1.mode === 'manual') {
+                    fan1.status = !fan1.status;
+                    updateFan1Button();
                 }
             } else {
-                fan2Status = !fan2Status;
-                const btn = document.getElementById('fan2Btn');
-                const status = document.getElementById('fan2Status');
-                if (fan2Status) {
-                    btn.classList.add('active');
-                    status.textContent = 'ON';
-                } else {
-                    btn.classList.remove('active');
-                    status.textContent = 'OFF';
+                if (fan2.mode === 'manual') {
+                    fan2.status = !fan2.status;
+                    updateFan2Button();
                 }
             }
         }
 
-        // Toggle Buzzer
-        function toggleBuzzer() {
-            buzzerStatus = !buzzerStatus;
+        function setFan1Mode(mode) {
+            fan1.mode = mode;
+            document.querySelectorAll('#kontrol .mode-btn').forEach((btn, idx) => {
+                if (idx < 2) btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            document.getElementById('fan1Mode').textContent = mode === 'manual' ? 'Manual' : 'Otomatis';
+            if (mode === 'manual') fan1.status = false;
+            updateFan1Button();
+        }
+
+        function setFan2Mode(mode) {
+            fan2.mode = mode;
+            const buttons = document.querySelectorAll('#kontrol .mode-btn');
+            buttons[2].classList.remove('active');
+            buttons[3].classList.remove('active');
+            event.target.classList.add('active');
+            document.getElementById('fan2Mode').textContent = mode === 'manual' ? 'Manual' : 'Otomatis';
+            if (mode === 'manual') fan2.status = false;
+            updateFan2Button();
+        }
+
+        function updateFan1Threshold() {
+            fan1.threshold = parseFloat(document.getElementById('fan1Threshold').value);
+            document.getElementById('fan1ThresholdDisplay').textContent = fan1.threshold;
+        }
+
+        function updateFan2Threshold() {
+            fan2.threshold = parseFloat(document.getElementById('fan2Threshold').value);
+            document.getElementById('fan2ThresholdDisplay').textContent = fan2.threshold;
+        }
+
+        function updateFan1Button() {
+            const btn = document.getElementById('fan1Btn');
+            const status = document.getElementById('fan1Status');
+            if (fan1.status) {
+                btn.classList.add('active');
+                status.textContent = 'ON';
+            } else {
+                btn.classList.remove('active');
+                status.textContent = 'OFF';
+            }
+        }
+
+        function updateFan2Button() {
+            const btn = document.getElementById('fan2Btn');
+            const status = document.getElementById('fan2Status');
+            if (fan2.status) {
+                btn.classList.add('active');
+                status.textContent = 'ON';
+            } else {
+                btn.classList.remove('active');
+                status.textContent = 'OFF';
+            }
+        }
+
+        // Buzzer Controls
+        function toggleBuzzer(mode) {
+            if (buzzer.mode === 'manual') {
+                buzzer.status = !buzzer.status;
+                updateBuzzerButton();
+            }
+        }
+
+        function setBuzzerMode(mode) {
+            buzzer.mode = mode;
+            const buttons = document.querySelectorAll('#kontrol .mode-btn');
+            buttons[4].classList.remove('active');
+            buttons[5].classList.remove('active');
+            event.target.classList.add('active');
+            document.getElementById('buzzerMode').textContent = mode === 'manual' ? 'Manual' : 'Otomatis';
+            if (mode === 'manual') buzzer.status = false;
+            updateBuzzerButton();
+        }
+
+        function updateBuzzerThreshold() {
+            buzzer.threshold = parseFloat(document.getElementById('buzzerThreshold').value);
+            document.getElementById('buzzerThresholdDisplay').textContent = buzzer.threshold;
+        }
+
+        function updateBuzzerButton() {
             const btn = document.getElementById('buzzerBtn');
             const status = document.getElementById('buzzerStatus');
-            if (buzzerStatus) {
+            if (buzzer.status) {
                 btn.classList.add('active');
                 status.textContent = 'ON';
             } else {
@@ -1027,34 +1285,52 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             
             // Keep values within reasonable ranges
             tempRuangan = Math.max(25, Math.min(35, tempRuangan));
-            tempMesin = Math.max(40, Math.min(55, tempMesin));
+            tempMesin = Math.max(40, Math.min(58, tempMesin));
             
             document.getElementById('tempRuangan').textContent = tempRuangan.toFixed(1);
             document.getElementById('tempMesin').textContent = tempMesin.toFixed(1);
             document.getElementById('humidityRuangan').textContent = Math.round(Math.random() * 30 + 55);
             
-            // Update status
+            // Update status mesin
             if (tempMesin > 50) {
                 document.getElementById('statusMesin').textContent = 'TINGGI';
                 document.getElementById('statusMesin').style.color = '#e74c3c';
-                // Auto trigger buzzer
-                if (!buzzerStatus) {
-                    buzzerStatus = true;
-                    document.getElementById('buzzerBtn').classList.add('active');
-                    document.getElementById('buzzerStatus').textContent = 'ON';
-                }
             } else if (tempMesin > 45) {
                 document.getElementById('statusMesin').textContent = 'Sedang';
                 document.getElementById('statusMesin').style.color = '#f1c40f';
             } else {
                 document.getElementById('statusMesin').textContent = 'Normal';
                 document.getElementById('statusMesin').style.color = '#2ecc71';
-                // Auto turn off buzzer
-                if (buzzerStatus) {
-                    buzzerStatus = false;
-                    document.getElementById('buzzerBtn').classList.remove('active');
-                    document.getElementById('buzzerStatus').textContent = 'OFF';
+            }
+
+            // Auto-control Kipas 1 (DHT22)
+            if (fan1.mode === 'auto') {
+                if (tempRuangan >= fan1.threshold) {
+                    fan1.status = true;
+                } else if (tempRuangan < (fan1.threshold - 2)) {
+                    fan1.status = false;
                 }
+                updateFan1Button();
+            }
+
+            // Auto-control Kipas 2 (PT100)
+            if (fan2.mode === 'auto') {
+                if (tempMesin >= fan2.threshold) {
+                    fan2.status = true;
+                } else if (tempMesin < (fan2.threshold - 2)) {
+                    fan2.status = false;
+                }
+                updateFan2Button();
+            }
+
+            // Auto-control Buzzer
+            if (buzzer.mode === 'auto') {
+                if (tempMesin >= buzzer.threshold) {
+                    buzzer.status = true;
+                } else if (tempMesin < (buzzer.threshold - 2)) {
+                    buzzer.status = false;
+                }
+                updateBuzzerButton();
             }
         }
 
