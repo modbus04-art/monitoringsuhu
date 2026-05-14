@@ -344,6 +344,109 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             color: #3498db;
         }
 
+        /* Status badges for temperature */
+        .status-cold {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-normal {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-warm {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            animation: pulse-warning 1.5s infinite;
+        }
+
+        .status-hot {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            animation: pulse-danger 1s infinite;
+        }
+
+        .status-danger {
+            background: rgba(192, 57, 43, 0.3);
+            color: #c0392b;
+            border: 2px solid rgba(192, 57, 43, 0.6);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: block;
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            animation: pulse-fire 0.8s infinite;
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(241, 196, 15, 0); }
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0); }
+        }
+
+        @keyframes pulse-fire {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(192, 57, 43, 0.8), 0 0 20px rgba(231, 76, 60, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(192, 57, 43, 1), 0 0 40px rgba(231, 76, 60, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        /* Humidity status */
+        .humidity-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .humidity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
         /* Control buttons */
         .control-grid {
             display: grid;
@@ -738,6 +841,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                 <!-- Monitoring Section -->
                 <div class="section active" id="monitoring">
                     <div class="row mb-4">
+                        <!-- Suhu Ruangan Card -->
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header">
@@ -752,13 +856,35 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                                         </div>
                                         <div class="temp-value" id="tempRuangan">28.5</div>
                                         <div class="temp-label">°C</div>
-                                        <div class="temp-status">
-                                            <i class="fas fa-droplet"></i> Kelembaban: <span id="humidityRuangan">65</span>%
+                                        
+                                        <!-- Status Suhu Ruangan -->
+                                        <div id="statusTempRuangan" class="status-normal">
+                                            <i class="fas fa-check-circle"></i> Normal
+                                        </div>
+
+                                        <!-- Humidity Section -->
+                                        <div style="margin-top: 20px; text-align: left;">
+                                            <div style="color: #b0bec5; font-size: 12px; font-weight: 600; margin-bottom: 8px;">
+                                                <i class="fas fa-droplet"></i> Kelembaban Ruangan
+                                            </div>
+                                            <div class="humidity-bar">
+                                                <div class="humidity-fill" id="humidityFill" style="width: 65%;"></div>
+                                            </div>
+                                            <div style="color: #b0bec5; font-size: 13px; margin-top: 8px; text-align: center; font-weight: 600;">
+                                                <span id="humidityRuangan">65</span>%
+                                            </div>
+                                        </div>
+
+                                        <!-- Status Kelembaban -->
+                                        <div id="statusHumidity" class="status-normal" style="margin-top: 10px; display: inline-block;">
+                                            <i class="fas fa-check-circle"></i> Normal
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Suhu Mesin Card -->
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header">
@@ -773,8 +899,33 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                                         </div>
                                         <div class="temp-value" id="tempMesin">45.3</div>
                                         <div class="temp-label">°C</div>
-                                        <div class="temp-status">
-                                            <i class="fas fa-gauge"></i> Status: <span id="statusMesin">Normal</span>
+                                        
+                                        <!-- Status Suhu Mesin -->
+                                        <div id="statusTempMesin" class="status-normal">
+                                            <i class="fas fa-check-circle"></i> Normal
+                                        </div>
+
+                                        <!-- Danger Warning untuk Kebakaran -->
+                                        <div id="dangerAlert" style="display: none;">
+                                            <div class="status-danger">
+                                                <i class="fas fa-fire"></i> ⚠️ PERINGATAN: POTENSI KEBAKARAN! ⚠️
+                                                <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
+                                                    Suhu Mesin Sangat Tinggi - Ambil Tindakan Segera!
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Temperature Info -->
+                                        <div style="margin-top: 20px; text-align: left; font-size: 12px; color: #b0bec5;">
+                                            <div style="margin-bottom: 10px;">
+                                                <strong>Status Detail:</strong><br>
+                                                <span id="statusDetailMesin">Normal - Semua sistem aman</span>
+                                            </div>
+                                            <div style="padding: 10px; background: rgba(52, 152, 219, 0.1); border-radius: 6px; border-left: 3px solid #3498db;">
+                                                <strong style="color: #3498db;">💡 Info:</strong><br>
+                                                Batas aman: 0-50°C<br>
+                                                Zona bahaya: >55°C
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1163,6 +1314,32 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             }
         }
 
+        // Get status berdasarkan suhu
+        function getTemperatureStatus(temp, type) {
+            if (type === 'ruangan') {
+                if (temp < 18) return { status: 'Dingin', class: 'status-cold', icon: '❄️' };
+                if (temp < 25) return { status: 'Sejuk', class: 'status-normal', icon: '✓' };
+                if (temp < 32) return { status: 'Normal', class: 'status-normal', icon: '✓' };
+                if (temp < 38) return { status: 'Hangat', class: 'status-warm', icon: '⚠️' };
+                return { status: 'Panas', class: 'status-hot', icon: '🔥' };
+            } else if (type === 'mesin') {
+                if (temp < 35) return { status: 'Dingin', class: 'status-cold', icon: '❄️' };
+                if (temp < 45) return { status: 'Normal', class: 'status-normal', icon: '✓' };
+                if (temp < 50) return { status: 'Panas', class: 'status-warm', icon: '⚠️' };
+                if (temp < 55) return { status: 'Sangat Panas', class: 'status-hot', icon: '🔥' };
+                return { status: 'BERBAHAYA - Potensi Kebakaran', class: 'status-danger', icon: '🚨' };
+            }
+        }
+
+        // Get humidity status
+        function getHumidityStatus(humidity) {
+            if (humidity < 30) return { status: 'Terlalu Kering', class: 'status-cold', icon: '🌵' };
+            if (humidity < 50) return { status: 'Kering', class: 'status-normal', icon: '✓' };
+            if (humidity < 70) return { status: 'Normal', class: 'status-normal', icon: '✓' };
+            if (humidity < 85) return { status: 'Lembab', class: 'status-warm', icon: '💧' };
+            return { status: 'Sangat Lembab', class: 'status-hot', icon: '⚠️' };
+        }
+
         // Fan 1 Controls (DHT22)
         function toggleFan(fanNumber, mode) {
             if (fanNumber === 1) {
@@ -1284,23 +1461,56 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
             let tempMesin = parseFloat(document.getElementById('tempMesin').textContent) + mesinVariation;
             
             // Keep values within reasonable ranges
-            tempRuangan = Math.max(25, Math.min(35, tempRuangan));
-            tempMesin = Math.max(40, Math.min(58, tempMesin));
+            tempRuangan = Math.max(25, Math.min(40, tempRuangan));
+            tempMesin = Math.max(40, Math.min(62, tempMesin));
             
             document.getElementById('tempRuangan').textContent = tempRuangan.toFixed(1);
             document.getElementById('tempMesin').textContent = tempMesin.toFixed(1);
-            document.getElementById('humidityRuangan').textContent = Math.round(Math.random() * 30 + 55);
             
-            // Update status mesin
-            if (tempMesin > 50) {
-                document.getElementById('statusMesin').textContent = 'TINGGI';
-                document.getElementById('statusMesin').style.color = '#e74c3c';
+            let humidity = Math.round(Math.random() * 30 + 55);
+            document.getElementById('humidityRuangan').textContent = humidity;
+
+            // Update humidity bar
+            document.getElementById('humidityFill').style.width = humidity + '%';
+
+            // Update status suhu ruangan
+            const statusRuangan = getTemperatureStatus(tempRuangan, 'ruangan');
+            const statusRuanganEl = document.getElementById('statusTempRuangan');
+            statusRuanganEl.className = statusRuangan.class;
+            statusRuanganEl.innerHTML = `<i class="fas fa-check-circle"></i> ${statusRuangan.status}`;
+
+            // Update status kelembaban
+            const statusHumidity = getHumidityStatus(humidity);
+            const statusHumidityEl = document.getElementById('statusHumidity');
+            statusHumidityEl.className = statusHumidity.class;
+            statusHumidityEl.innerHTML = `<i class="fas fa-check-circle"></i> ${statusHumidity.status}`;
+
+            // Update status suhu mesin
+            const statusMesin = getTemperatureStatus(tempMesin, 'mesin');
+            const statusMesinEl = document.getElementById('statusTempMesin');
+            statusMesinEl.className = statusMesin.class;
+            statusMesinEl.innerHTML = `<i class="fas fa-check-circle"></i> ${statusMesin.status}`;
+
+            // Update status detail mesin
+            if (tempMesin > 55) {
+                document.getElementById('statusDetailMesin').textContent = '🚨 BAHAYA - Potensi Kebakaran! Ambil tindakan segera!';
+                document.getElementById('dangerAlert').style.display = 'block';
+                if (buzzer.mode === 'auto') buzzer.status = true;
+                if (fan2.mode === 'auto') fan2.status = true;
+            } else if (tempMesin > 50) {
+                document.getElementById('statusDetailMesin').textContent = '⚠️ PERINGATAN - Suhu Sangat Tinggi! Monitor dengan ketat!';
+                document.getElementById('dangerAlert').style.display = 'none';
+                if (buzzer.mode === 'auto') buzzer.status = true;
+                if (fan2.mode === 'auto') fan2.status = true;
             } else if (tempMesin > 45) {
-                document.getElementById('statusMesin').textContent = 'Sedang';
-                document.getElementById('statusMesin').style.color = '#f1c40f';
+                document.getElementById('statusDetailMesin').textContent = '💡 Suhu Tinggi - Dalam Pemantauan';
+                document.getElementById('dangerAlert').style.display = 'none';
+                if (buzzer.mode === 'auto' && tempMesin >= buzzer.threshold) buzzer.status = true;
+                else if (buzzer.mode === 'auto') buzzer.status = false;
             } else {
-                document.getElementById('statusMesin').textContent = 'Normal';
-                document.getElementById('statusMesin').style.color = '#2ecc71';
+                document.getElementById('statusDetailMesin').textContent = '✓ Normal - Semua sistem aman';
+                document.getElementById('dangerAlert').style.display = 'none';
+                if (buzzer.mode === 'auto') buzzer.status = false;
             }
 
             // Auto-control Kipas 1 (DHT22)
@@ -1323,15 +1533,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
                 updateFan2Button();
             }
 
-            // Auto-control Buzzer
-            if (buzzer.mode === 'auto') {
-                if (tempMesin >= buzzer.threshold) {
-                    buzzer.status = true;
-                } else if (tempMesin < (buzzer.threshold - 2)) {
-                    buzzer.status = false;
-                }
-                updateBuzzerButton();
-            }
+            // Update buzzer button
+            updateBuzzerButton();
+            updateFan2Button();
         }
 
         // Update setiap 3 detik
